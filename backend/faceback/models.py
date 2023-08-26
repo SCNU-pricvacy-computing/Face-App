@@ -29,10 +29,10 @@ class UserInfo(models.Model):
 
 
 def user_directory_path(instance, filename):
-    return 'user_{0}/{1}'.format(instance.user.phone, filename)
+    return 'user_{0}/{1}'.format(instance.user.account, filename)
 
 def test_directory_path(instance, filename):
-    return 'test_{0}/{1}'.format(instance.test.phone, filename)
+    return 'test_{0}/{1}'.format(instance.test.account, filename)
 
 
 
