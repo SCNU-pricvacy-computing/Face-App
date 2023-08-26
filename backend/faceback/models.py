@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 from django.core.files.storage import FileSystemStorage
-from backend.settings import MEDIA_ROOT, MEDIA_URL
+from back.settings import MEDIA_ROOT, MEDIA_URL
 
 
 # Create your models here.
