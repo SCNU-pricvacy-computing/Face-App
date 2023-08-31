@@ -18,7 +18,6 @@ class UserInfo(models.Model):
 
 
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False,verbose_name='id')
     account = models.CharField(verbose_name='account',max_length=30)
     password = models.CharField(max_length=30, verbose_name='password')
     update_time = models.DateTimeField(auto_now=True, verbose_name='update_time')
