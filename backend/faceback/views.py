@@ -68,5 +68,19 @@ class User_Detail_api(APIView):
         user.delete()
         return Response(status = status.HTTP_204_NO_CONTENT)
     
+
+
+
+class UserFaceImage_List_api(APIView):
+    """list all user face image or create a new user face image"""
+
+    def get(self, request, format = None):
+        userfaceimage = UserFaceImage.objects.all()
+        serializer = UserFaceImageSerializer(userfaceimage, many = True)
+        return Response(serializer.data)
     
+
+    def post(self, request, account,format = None):
+        user = UserInfo.objects.get(account = account)
+        
 

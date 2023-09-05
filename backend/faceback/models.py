@@ -23,8 +23,6 @@ class UserInfo(models.Model):
     update_time = models.DateTimeField(auto_now=True, verbose_name='update_time')
     date_time = models.DateTimeField(auto_now_add=True, verbose_name='date_time')
 
-    def __str__(self):
-        return self.id
 
 
 
