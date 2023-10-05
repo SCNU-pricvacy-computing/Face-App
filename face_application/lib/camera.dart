@@ -6,9 +6,11 @@ List<CameraDescription>? cameras;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -55,10 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Center(
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
-              Container(
+              SizedBox(
                 width: 200,
                 height: 200,
                 child: AspectRatio(
@@ -77,9 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       print(e);
                     }
                   },
-                  child: Text("Take Photo")),
+                  child: const Text("Take Photo")),
               if (imagePath != "")
-                Container(
+                SizedBox(
                     width: 300,
                     height: 300,
                     child: Image.file(
