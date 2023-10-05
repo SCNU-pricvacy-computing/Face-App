@@ -56,7 +56,7 @@ class UserTesteImage(models.Model):
         verbose_name_plural = 'usertestimage'
 
 
-    test = models.ForeignKey(UserInfo, on_delete=models.CASCADE, related_name ='test')
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, related_name ='test')
     test_image = models.ImageField(upload_to=test_directory_path, verbose_name='test_image',storage=image_storage)
 
 

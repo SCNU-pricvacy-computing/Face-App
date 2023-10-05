@@ -7,6 +7,11 @@ from django.http import Http404
 import json
 
 
+# import fr_algorithms.siamese as siamese
+# from fr_algorithms.facenet.predict import FaceNet_recognize_organization
+# from fr_algorithms.deepface import DeepFace_recognize_organization
+
+
 
 class User_List_api(APIView):
     """list all user or create a new user"""
@@ -71,16 +76,40 @@ class User_Detail_api(APIView):
 
 
 
-class UserFaceImage_List_api(APIView):
-    """list all user face image or create a new user face image"""
-
-    def get(self, request, format = None):
-        userfaceimage = UserFaceImage.objects.all()
-        serializer = UserFaceImageSerializer(userfaceimage, many = True)
+class TestUserface(APIView):
+    def get(self,request,format = None):
+        imgs = UserTesteImage.objects.all()
+        serializer = UserTesteImageSerializer(imgs, many=True)
         return Response(serializer.data)
     
 
-    def post(self, request, account,format = None):
-        user = UserInfo.objects.get(account = account)
+    def post(self,request, account, format=None):
+        # user post the face img
+        # get user's identity
+        account = request.data.get('account')
+        try:
+            user = UserInfo.objects.get(account = account)
+        except UserInfo.DoesNotExist:
+            return Response(status = status.HTTP_400_BAD_REQUEST)
         
+        test_iamge_req = request.FILES.get('test_image')
+        old_iamges = user.test.all()
+        for images in old_iamges:
+            usertestimage_delete(instance = images)
+            images.delete()
+
+        test_image = user.test.create()
+        test_image.test_image.save(test_iamge_req.name, test_iamge_req)
+
+        # test the face img
+        result = Facenet_recognition(str(account))
+        if result != "can't recognize identity" and result != "can't recognize face":
+            detected_user = UserInfo.objects.get(account = int(result))
+            result = detected_user.account
+
+        result = {"user":result}
+        return Response(json.loads(result), status = status.HTTP_200_OK)
+
+
+
 
