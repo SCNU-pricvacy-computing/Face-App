@@ -32,6 +32,8 @@ class UserInfoSerializer(ModelSerializer):
     extra_kwargs = {
         'password': {'required': False},
         'account': {'required': False},
+        'phone': {'required': False},
+        'email': {'required': False},
         'update_time': {'required': False},
         'date_time': {'required': False}
     }

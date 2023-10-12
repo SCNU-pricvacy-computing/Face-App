@@ -20,6 +20,8 @@ class UserInfo(models.Model):
 
     account = models.CharField(verbose_name='account',max_length=30)
     password = models.CharField(max_length=30, verbose_name='password')
+    phone = models.CharField(max_length=30, verbose_name='phone')
+    email = models.CharField(max_length=30, verbose_name='email')
     update_time = models.DateTimeField(auto_now=True, verbose_name='update_time')
     date_time = models.DateTimeField(auto_now_add=True, verbose_name='date_time')
 

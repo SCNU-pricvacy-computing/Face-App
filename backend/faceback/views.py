@@ -5,7 +5,10 @@ from .models import UserInfo, UserFaceImage, UserTesteImage, userfaceimage_delet
 from .serializers import UserInfoSerializer, UserFaceImageSerializer, UserTesteImageSerializer
 from django.http import Http404
 import json
-
+from django.contrib.auth.hashers import make_password
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 
 # import fr_algorithms.siamese as siamese
 # from fr_algorithms.facenet.predict import FaceNet_recognize_organization
@@ -27,51 +30,64 @@ class User_List_api(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
-class User_Detail_api(APIView):
-    """Retrieve, update or delete a user instance."""
-    
-    def get(self, request, account, format = None):
+class Login_api(APIView):
+
+
+    def get(self, request):
+        user = UserInfo.objects.all()
+        serializer = UserInfoSerializer(user, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        account = request.data.get('account')
+        password = request.data.get('password')
+
+        if account is None or password is None:
+            return Response({'error': 'Please provide both account and password'},
+                            status=status.HTTP_400_BAD_REQUEST)
         try:
             user = UserInfo.objects.get(account = account)
-            serializer = UserInfoSerializer(user)
-            return Response(serializer.data)
-        except UserInfo.DoesNotExist:
-            raise Http404
-        
-    
-    def put(self, request, account, format = None):
-        user = self.get_object(account = account)
-        serializer = UserInfoSerializer(user, data = request.data)
-        if serializer.is_valid():
-            imagelist = dict(request.data)['image']
-            old_images = UserFaceImage.objects.all()
-            for old_image in old_images:
-                userfaceimage_delete(instance = old_image)
-                old_image.delete()
-                
-            for image in imagelist:
-                user_image = user.images.create(image = image)
-                user_image.image.save(image.name, image)
-                serializer.save()
-            return Response(status = status.HTTP_200_OK)
-        return Response(serializer.error, status = status.HTTP_400_BAD_REQUEST)
-    
-
-    def post(self, request, account,format = None):
-        user = UserInfo.objects.get(account)
-        serializer = UserInfoSerializer(user)
-        """get the account and password"""
-        password = request.data.get('password')
-        if serializer.is_valid():
-            if user.password == password:
-                return Response(request.data, status = status.HTTP_200_OK)
+            if password == user.password:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'account': account,
+                })
             else:
-                return Response(status = status.HTTP_400_BAD_REQUEST)
-            
-    def delete(self, request, account, format = None):
-        user = UserInfo.objects.get(account)
-        user.delete()
-        return Response(status = status.HTTP_204_NO_CONTENT)
+                return Response({'error': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"the error is {e}")
+            return Response({'error': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+class Register_api(APIView):
+    def get(self, request):
+        user = UserInfo.objects.all()
+        serializer = UserInfoSerializer(user, many=True)
+        return Response(serializer.data)
+        
+
+
+
+    def post(self, request):
+        account = request.data.get('account')
+        olduser = UserInfo.objects.filter(account = account)
+        if olduser:
+            return Response({'error': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            serializer = UserInfoSerializer(data = request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"success":"register success"}, status = status.HTTP_201_CREATED,data=serializer.data)
+            else:
+                return Response({'error': 'register false 45', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+                
     
 
 
