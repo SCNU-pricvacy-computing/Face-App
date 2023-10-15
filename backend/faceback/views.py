@@ -57,8 +57,7 @@ class Login_api(APIView):
             else:
                 return Response({'error': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(f"the error is {e}")
-            return Response({'error': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'Invalid account'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -81,8 +80,13 @@ class Register_api(APIView):
         else:
             serializer = UserInfoSerializer(data = request.data)
             if serializer.is_valid():
+                # hash the password
+                new_password = make_password(request.data.get('password'))
+                serializer.save(password = new_password)
+
                 serializer.save()
-                return Response({"success":"register success"}, status = status.HTTP_201_CREATED,data=serializer.data)
+                # return Response({'success': 'register success'},status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response({'error': 'register false 45', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
